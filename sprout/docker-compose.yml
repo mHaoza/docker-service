@@ -1,0 +1,39 @@
+services:
+  web:
+    container_name: sprout
+    image: node:24.10.0-slim
+    working_dir: /var/www/nuxt-app
+    environment:
+      - NODE_ENV=production
+      - PNPM_HOME=/root/.local/share/pnpm
+      - GIT_CLONE_URL=https://github.com/mHaoza/sprout.git
+    command:
+      - sh
+      - -ec
+      - |
+          if ! command -v git >/dev/null 2>&1; then
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get update
+            apt-get install -y git openssh-client
+            rm -rf /var/lib/apt/lists/*
+          fi
+
+          if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+            git -C . pull --rebase --autostash
+          elif [ -z "$(ls -A)" ]; then
+            git clone --depth=1 ${GIT_CLONE_URL:-https://github.com/mHaoza/sprout.git} .
+          else
+            echo "Detected non-empty directory without git repo, skipping clone"
+          fi
+
+          corepack enable
+          pnpm install --frozen-lockfile
+          pnpm build
+          pnpm start
+    ports:
+      - '80:3000'
+    restart: unless-stopped
+
+networks:
+  default:
+    name: sprout-net

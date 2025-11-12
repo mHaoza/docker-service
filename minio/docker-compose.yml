@@ -1,19 +1,42 @@
 services:
   minio:
-    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    build:
+      context: .
+      dockerfile: Dockerfile.minio
     container_name: minio
     restart: unless-stopped
     ports:
       - "9000:9000"
       - "9001:9001"
-    environment:
-      MINIO_ROOT_USER: admin
-      MINIO_ROOT_PASSWORD: rust123456
+    env_file:
+      - .env
     volumes:
       - ./data:/data
-    command: server /data --console-address ":9001"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 20s
-      retries: 3
+
+  backup:
+    build:
+      context: .
+      dockerfile: Dockerfile.backup
+    container_name: minio-backup
+    profiles:
+      - tools
+    depends_on:
+      - minio
+    env_file:
+      - .env
+    volumes:
+      - ./backup:/backup
+
+  restore:
+    build:
+      context: .
+      dockerfile: Dockerfile.restore
+    container_name: minio-restore
+    profiles:
+      - tools
+    depends_on:
+      - minio
+    env_file:
+      - .env
+    volumes:
+      - ./backup:/backup

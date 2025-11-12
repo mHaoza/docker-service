@@ -1,0 +1,9 @@
+FROM minio/minio:RELEASE.2025-04-22T22-12-26Z
+
+# 设置健康检查
+HEALTHCHECK --interval=30s --timeout=20s --retries=3 \
+  CMD curl -f http://localhost:9000/minio/health/live || exit 1
+
+# 设置默认命令
+CMD ["server", "/data", "--console-address", ":9001"]
+

@@ -1,0 +1,34 @@
+FROM minio/mc:latest
+
+# 创建备份脚本
+RUN echo '#!/bin/sh' > /backup.sh && \
+    echo 'echo "=== MinIO 备份脚本 ==="' >> /backup.sh && \
+    echo 'echo "正在连接 MinIO 服务: http://minio:9000"' >> /backup.sh && \
+    echo 'echo "用户名: $MINIO_ROOT_USER"' >> /backup.sh && \
+    echo 'MAX_RETRIES=30' >> /backup.sh && \
+    echo 'RETRY_COUNT=0' >> /backup.sh && \
+    echo 'while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do' >> /backup.sh && \
+    echo '  if mc alias set local http://minio:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" 2>/dev/null; then' >> /backup.sh && \
+    echo '    echo "MinIO 服务连接成功！"' >> /backup.sh && \
+    echo '    break' >> /backup.sh && \
+    echo '  fi' >> /backup.sh && \
+    echo '  RETRY_COUNT=$((RETRY_COUNT + 1))' >> /backup.sh && \
+    echo '  echo "等待 MinIO 服务就绪... ($RETRY_COUNT/$MAX_RETRIES)"' >> /backup.sh && \
+    echo '  sleep 2' >> /backup.sh && \
+    echo 'done' >> /backup.sh && \
+    echo 'if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then' >> /backup.sh && \
+    echo '  echo "错误：无法连接到 MinIO 服务！"' >> /backup.sh && \
+    echo '  exit 1' >> /backup.sh && \
+    echo 'fi' >> /backup.sh && \
+    echo 'mkdir -p /backup' >> /backup.sh && \
+    echo 'echo "开始备份 MinIO 数据到 /backup 目录..."' >> /backup.sh && \
+    echo 'if mc mirror --overwrite local /backup; then' >> /backup.sh && \
+    echo '  echo "=== 备份完成！ ==="' >> /backup.sh && \
+    echo '  exit 0' >> /backup.sh && \
+    echo 'else' >> /backup.sh && \
+    echo '  echo "=== 备份失败！ ==="' >> /backup.sh && \
+    echo '  exit 1' >> /backup.sh && \
+    echo 'fi' >> /backup.sh && \
+    chmod +x /backup.sh
+
+ENTRYPOINT ["/backup.sh"]

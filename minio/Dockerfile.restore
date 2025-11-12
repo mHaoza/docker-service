@@ -1,0 +1,19 @@
+FROM minio/mc:latest
+
+# 创建恢复脚本
+RUN echo '#!/bin/sh' > /restore.sh && \
+    echo 'until mc alias set local http://minio:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD"; do' >> /restore.sh && \
+    echo '  echo "等待 MinIO 服务就绪..."' >> /restore.sh && \
+    echo '  sleep 2' >> /restore.sh && \
+    echo 'done' >> /restore.sh && \
+    echo 'if [ ! -d "/backup" ] || [ -z "$(ls -A /backup)" ]; then' >> /restore.sh && \
+    echo '  echo "错误：备份目录为空或不存在！"' >> /restore.sh && \
+    echo '  exit 1' >> /restore.sh && \
+    echo 'fi' >> /restore.sh && \
+    echo 'echo "警告：此操作将覆盖 MinIO 中的现有数据！"' >> /restore.sh && \
+    echo 'echo "开始从备份恢复数据..."' >> /restore.sh && \
+    echo 'mc mirror --overwrite /backup local' >> /restore.sh && \
+    echo 'echo "恢复完成！"' >> /restore.sh && \
+    chmod +x /restore.sh
+
+ENTRYPOINT ["/restore.sh"]

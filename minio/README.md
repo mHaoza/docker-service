@@ -2,7 +2,7 @@
 Minio 是一款开源的对象存储服务，它兼容亚马逊 S3 接口，可以作为云存储服务使用。
 
 ## 目录结构
-- `docker-compose.yml`: MinIO 的编排定义
+- `docker-compose.yaml`: MinIO 的编排定义
 - `Dockerfile.minio`: MinIO 主服务的 Dockerfile
 - `Dockerfile.backup`: 备份服务的 Dockerfile
 - `Dockerfile.restore`: 恢复服务的 Dockerfile

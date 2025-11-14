@@ -1,0 +1,42 @@
+services:
+  minio:
+    build:
+      context: .
+      dockerfile: Dockerfile.minio
+    container_name: minio
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/data
+
+  backup:
+    build:
+      context: .
+      dockerfile: Dockerfile.backup
+    container_name: minio-backup
+    profiles:
+      - tools
+    depends_on:
+      - minio
+    env_file:
+      - .env
+    volumes:
+      - ./backup:/backup
+
+  restore:
+    build:
+      context: .
+      dockerfile: Dockerfile.restore
+    container_name: minio-restore
+    profiles:
+      - tools
+    depends_on:
+      - minio
+    env_file:
+      - .env
+    volumes:
+      - ./backup:/backup

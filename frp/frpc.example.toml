@@ -1,0 +1,17 @@
+serverAddr = "x.x.x.x"  # 公网服务器 IP
+serverPort = 7000
+auth.method = "token"
+auth.token = "your_token"
+
+[[proxies]]
+name = "ssh"
+type = "tcp"
+localIP = "127.0.0.1"
+localPort = 22
+remotePort = 6000
+
+[[proxies]]
+name = "web"
+type = "http"
+localPort = 80
+customDomains = ["yourdomain.com"]

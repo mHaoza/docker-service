@@ -1,0 +1,20 @@
+services:
+  frps:
+    image: snowdreamtech/frps:latest
+    container_name: frps
+    profiles: [ "server" ]
+    volumes:
+      - ./frps.toml:/etc/frp/frps.toml:ro
+    ports:
+      - "7000:7000"
+      - "7500:7500"
+    restart: unless-stopped
+
+  frpc:
+    image: snowdreamtech/frpc:latest
+    container_name: frpc
+    profiles: [ "client" ]
+    network_mode: host # 关键点：共享宿主机网络
+    volumes:
+      - ./frpc.toml:/etc/frp/frpc.toml:ro
+    restart: unless-stopped

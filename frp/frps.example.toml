@@ -1,0 +1,9 @@
+bindPort = 7000
+auth.method = "token"
+auth.token = "your_token"
+
+# 管理面板（可选）
+webServer.addr = "0.0.0.0"
+webServer.port = 7500
+webServer.user = "admin"
+webServer.password = "admin"

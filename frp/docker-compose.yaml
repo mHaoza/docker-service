@@ -2,6 +2,7 @@ services:
   frps:
     image: snowdreamtech/frps:latest
     container_name: frps
+    network_mode: host # 关键点：共享宿主机网络
     profiles: [ "server" ]
     volumes:
       - ./frps.toml:/etc/frp/frps.toml:ro

@@ -1,0 +1,8 @@
+# SSL证书目录
+# 
+# 将SSL证书文件放在此目录下，文件命名规则：
+# - iice.fun.crt 和 iice.fun.key (主站证书)
+# - img.iice.fun.crt 和 img.iice.fun.key (图床证书)
+# 
+# 注意：证书文件应该添加到 .gitignore 中，不要提交到版本控制
+
